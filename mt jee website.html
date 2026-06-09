@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEE Analyser Pro — AI-Powered IIT JEE Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#04040a;--bg2:#080812;--surface:#0d0d1a;--surface2:#12122a;--surface3:#1a1a35;
+  --border:rgba(100,100,255,0.12);--border2:rgba(100,100,255,0.25);
+  --accent:#5b5eff;--accent2:#00f0ff;--accent3:#ff3cac;--accent4:#f7b731;
+  --green:#00e676;--red:#ff4444;--amber:#ffaa00;--text:#e8e8ff;--text2:#8888bb;
+  --physics:#38bdf8;--chemistry:#34d399;--maths:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(91,94,255,0.18),transparent),linear-gradient(rgba(91,94,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(91,94,255,0.04) 1px,transparent 1px);background-size:100% 100%,60px 60px,60px 60px;pointer-events:none;z-index:0}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(4,4,10,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(91,94,255,0.4)}
+.brand-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text);letter-spacing:.05em}
+.brand-pro{font-size:10px;padding:2px 7px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;color:#fff;font-family:'IBM Plex Mono',monospace;margin-left:4px}
+.nav-tabs{display:flex;gap:2px}
+.nt{padding:6px 14px;background:none;border:none;color:var(--text2);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;border-radius:6px;transition:all .2s;position:relative}
+.nt:hover{color:var(--text);background:var(--surface2)}
+.nt.active{color:var(--accent2);background:rgba(0,240,255,0.07)}
+.nt.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--accent2)}
+.nav-score-pill{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2);padding:4px 12px;border:1px solid var(--border);border-radius:20px}
+.nav-score-pill span{color:var(--accent2);font-weight:600}
+
+.page{display:none;padding-top:60px;min-height:100vh;position:relative;z-index:1;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOME */
+.hero{padding:80px 60px 40px;max-width:1100px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;background:rgba(91,94,255,0.1);border:1px solid rgba(91,94,255,0.3);border-radius:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a78bfa;letter-spacing:.07em;margin-bottom:28px}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,240,255,.4)}50%{box-shadow:0 0 0 6px rgba(0,240,255,0)}}
+.hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(46px,7vw,88px);font-weight:700;line-height:1.0;margin-bottom:22px;letter-spacing:-.02em}
+.grad-text{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:16px;color:var(--text2);max-width:520px;line-height:1.75;margin-bottom:36px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:60px}
+.btn-glow{padding:13px 28px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 0 30px rgba(91,94,255,0.35)}
+.btn-glow:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(91,94,255,0.55)}
+.btn-ghost{padding:13px 28px;background:none;border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-ghost:hover{border-color:var(--accent2);color:var(--accent2)}
+
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-width:1100px;margin:0 auto 56px;padding:0 60px}
+.scard{background:var(--surface);padding:22px 20px;border-right:1px solid var(--border)}
+.scard:last-child{border-right:none}
+.scard-val{font-family:'Rajdhani',sans-serif;font-size:34px;font-weight:700;margin-bottom:4px}
+.scard-lbl{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text2);letter-spacing:.07em}
+
+.feat-section{max-width:1100px;margin:0 auto 80px;padding:0 60px}
+.feat-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:.1em;margin-bottom:20px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;transition:all .25s}
+.feat-card:hover{border-color:var(--border2);transform:translateY(-3px);background:var(--surface2)}
+.feat-icon{font-size:22px;margin-bottom:12px}
+.feat-title{font-size:14px;font-weight:600;margin-bottom:7px}
+.feat-desc{font-size:12px;color:var(--text2);line-height:1.65}
+
+/* MARKS */
+.marks-layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 60px)}
+.marks-sidebar{border-right:1px solid var(--border);padding:28px 18px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.sb-head{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:.1em;margin-bottom:14px}
+.sub-btn{width:100%;display:flex;flex-direction:column;gap:5px;padding:11px 12px;background:none;border:1px solid transparent;border-radius:8px;cursor:pointer;text-align:left;transition:all .2s;margin-bottom:4px}
+.sub-btn:hover{background:var(--surface2)}
+.sub-btn.active{background:var(--surface2);border-color:var(--border2)}
+.sb-top{display:flex;align-items:center;justify-content:space-between}
+.sb-name{font-size:13px;font-weight:600;color:var(--text)}
+.sb-pct{font-family:'IBM Plex Mono',monospace;font-size:11px}
+.sb-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.sb-fill{height:100%;border-radius:2px;transition:width .5s}
+.sb-divider{height:1px;background:var(--border);margin:18px 0}
+.sb-stat{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace;line-height:2.1}
+.sb-stat span{color:var(--text)}
+
+.marks-main{padding:32px 40px}
+.marks-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.marks-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700}
+.marks-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.run-btn{padding:10px 24px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 0 20px rgba(91,94,255,0.3)}
+.run-btn:hover{opacity:.9;transform:translateY(-1px)}
+
+.ch-tbl{width:100%;border-collapse:collapse}
+.ch-th{text-align:left;padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:.08em;border-bottom:1px solid var(--border)}
+.ch-tr{border-bottom:1px solid var(--border);transition:background .15s}
+.ch-tr:hover{background:var(--surface2)}
+.ch-td{padding:11px 12px}
+.ch-name{font-size:13px;font-weight:500}
+.ch-bar-wrap{height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin-bottom:3px;min-width:100px}
+.ch-bar-fill{height:100%;border-radius:3px;transition:width .4s,background .3s}
+.ch-bar-lbl{font-size:10px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
+.ch-input-wrap{display:flex;align-items:center;gap:7px}
+.ch-inp{width:58px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;transition:border-color .2s}
+.ch-inp:focus{outline:none;border-color:var(--accent2)}
+.ch-max{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
+.ch-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;min-width:38px;text-align:right}
+
+/* ANALYSIS */
+.anal-wrap{max-width:1100px;margin:0 auto;padding:36px 40px}
+.pg-head{margin-bottom:30px}
+.pg-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;margin-bottom:5px}
+.pg-sub{font-size:13px;color:var(--text2)}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:26px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,var(--kc,rgba(91,94,255,0.08)),transparent 70%)}
+.kpi-val{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;margin-bottom:3px}
+.kpi-lbl{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text2);letter-spacing:.06em}
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:24px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.cc-head{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:.08em;margin-bottom:16px}
+.chart-h{position:relative;height:190px}
+.lists-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.list-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.lc-head{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.count-pill{font-size:10px;padding:2px 8px;border-radius:10px}
+.cp-red{background:rgba(255,68,68,0.15);color:#ff4444}
+.cp-green{background:rgba(0,230,118,0.15);color:#00e676}
+.cp-amber{background:rgba(255,170,0,0.15);color:#ffaa00}
+.chap-row2{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:7px;margin-bottom:4px;background:var(--surface2);border-left:2px solid transparent;transition:background .15s}
+.chap-row2:hover{background:var(--surface3)}
+.chap-row2.w{border-left-color:var(--red)}
+.chap-row2.s{border-left-color:var(--green)}
+.chap-row2.m{border-left-color:var(--amber)}
+.cr-name{font-size:12px;font-weight:500}
+.cr-sub{font-size:10px;color:var(--text2);margin-top:1px}
+.cr-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600}
+.ai-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));border:none;border-radius:10px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:all .2s;position:relative;overflow:hidden}
+.ai-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);transform:translateX(-100%);transition:transform .5s}
+.ai-btn:hover::before{transform:translateX(100%)}
+.ai-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(91,94,255,0.4)}
+
+/* PLAN */
+.plan-wrap{max-width:880px;margin:0 auto;padding:36px 40px}
+.plan-tags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.ptag{padding:4px 12px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
+.ptag-red{background:rgba(255,68,68,0.12);color:#ff4444;border:1px solid rgba(255,68,68,0.2)}
+.ptag-blue{background:rgba(91,94,255,0.12);color:#a78bfa;border:1px solid rgba(91,94,255,0.2)}
+.week-header{display:flex;align-items:center;gap:14px;margin:28px 0 16px}
+.wk-num{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent2);white-space:nowrap}
+.wk-line{flex:1;height:1px;background:var(--border)}
+.wk-label{font-size:12px;color:var(--text2);white-space:nowrap}
+.day-card{display:flex;gap:14px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:all .2s}
+.day-card:hover{border-color:var(--border2);background:var(--surface2)}
+.day-num-box{min-width:50px;height:50px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--accent2);line-height:1.5}
+.day-body{flex:1}
+.day-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px}
+.day-detail{font-size:13px;color:var(--text2);line-height:1.55}
+.day-pills{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.dpill{font-size:10px;padding:2px 9px;border-radius:12px;font-family:'IBM Plex Mono',monospace}
+.dp-phy{background:rgba(56,189,248,0.12);color:#38bdf8}
+.dp-che{background:rgba(52,211,153,0.12);color:#34d399}
+.dp-mat{background:rgba(251,146,60,0.12);color:#fb923c}
+.dp-rev{background:rgba(167,139,250,0.12);color:#a78bfa}
+.dp-prac{background:rgba(255,60,172,0.12);color:#ff3cac}
+
+/* LEADERBOARD */
+.lb-wrap{max-width:920px;margin:0 auto;padding:36px 40px}
+.lb-tbl{width:100%;border-collapse:collapse}
+.lb-th{text-align:left;padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:.08em;border-bottom:1px solid var(--border)}
+.lb-tr{border-bottom:1px solid var(--border);transition:background .15s}
+.lb-tr:hover{background:var(--surface2)}
+.lb-tr.you-row{background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.12)}
+.lb-td{padding:13px 14px;font-size:13px}
+.rank-chip{width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700}
+.r1{background:linear-gradient(135deg,#f7b731,#ff9500);color:#000}
+.r2{background:linear-gradient(135deg,#ccc,#888);color:#000}
+.r3{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
+.rn{background:var(--surface2);color:var(--text2)}
+
+/* LOADING / EMPTY */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px;text-align:center}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent2);border-right-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-t{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;margin-bottom:6px}
+.loading-s{font-size:13px;color:var(--text2)}
+.empty-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px;text-align:center}
+.empty-ico{font-size:50px;opacity:.4;margin-bottom:18px}
+.empty-t{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:600;margin-bottom:8px}
+.empty-s{font-size:14px;color:var(--text2);margin-bottom:24px}
+
+@media(max-width:768px){
+  nav{padding:0 12px}.nav-tabs{gap:0}.nt{padding:6px 8px;font-size:12px}
+  .hero{padding:36px 16px 24px}.stats-strip,.feat-section{padding:0 16px}
+  .marks-layout{grid-template-columns:1fr}.marks-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);display:flex;gap:8px;overflow-x:auto;padding:14px 16px}
+  .marks-main{padding:18px 16px}.anal-wrap,.plan-wrap,.lb-wrap{padding:18px 16px}
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}.charts-grid{grid-template-columns:1fr}.lists-grid{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">
+    <div class="brand-icon">⚛</div>
+    <span class="brand-name">JEE ANALYSER</span>
+    <span class="brand-pro">PRO</span>
+  </a>
+  <div class="nav-tabs">
+    <button class="nt active" onclick="go('home')">Home</button>
+    <button class="nt" onclick="go('marks')">Enter Marks</button>
+    <button class="nt" onclick="go('analysis')">Analysis</button>
+    <button class="nt" onclick="go('plan')">Study Plan</button>
+    <button class="nt" onclick="go('leaderboard')">Leaderboard</button>
+  </div>
+  <div class="nav-score-pill">Score: <span id="nav-score">—</span></div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge"><div class="pulse-dot"></div>AI-POWERED · IIT JEE 2026 · CLASS 11 &amp; 12</div>
+    <h1><div>Decode Your</div><div class="grad-text">JEE Potential.</div></h1>
+    <p class="hero-desc">Enter chapter-wise marks across Physics, Chemistry and Maths. Get instant AI-powered weak point analysis and a personalised 2-week study plan.</p>
+    <div class="hero-btns">
+      <button class="btn-glow" onclick="go('marks')">Start Analysis →</button>
+      <button class="btn-ghost" onclick="go('leaderboard')">View Leaderboard</button>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="scard"><div class="scard-val" id="hs-ov" style="color:var(--accent2)">—</div><div class="scard-lbl">OVERALL SCORE</div></div>
+    <div class="scard"><div class="scard-val" id="hs-wk" style="color:var(--red)">—</div><div class="scard-lbl">WEAK CHAPTERS</div></div>
+    <div class="scard"><div class="scard-val" id="hs-st" style="color:var(--green)">—</div><div class="scard-lbl">STRONG CHAPTERS</div></div>
+    <div class="scard"><div class="scard-val" id="hs-dn" style="color:var(--amber)">—</div><div class="scard-lbl">CHAPTERS FILLED</div></div>
+  </div>
+  <div class="feat-section">
+    <div class="feat-eyebrow">FEATURES</div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">🧠</div><div class="feat-title">AI Study Plan</div><div class="feat-desc">Claude AI generates a personalised 14-day daily plan based on your exact weak chapters.</div></div>
+      <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Deep Analytics</div><div class="feat-desc">Bar charts, doughnut charts, KPI cards — a complete visual picture of your performance.</div></div>
+      <div class="feat-card"><div class="feat-icon">🏆</div><div class="feat-title">Leaderboard</div><div class="feat-desc">See where your score sits against other JEE aspirants from across India.</div></div>
+      <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Live Feedback</div><div class="feat-desc">Colour bars update as you type — red, amber, green — so you see gaps instantly.</div></div>
+      <div class="feat-card"><div class="feat-icon">🎯</div><div class="feat-title">36 Chapters</div><div class="feat-desc">Full tracking across all JEE chapters in Physics, Chemistry and Maths.</div></div>
+      <div class="feat-card"><div class="feat-icon">🏫</div><div class="feat-title">Coaching Ready</div><div class="feat-desc">Built to be white-labelled and deployed by coaching institutes with custom branding.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MARKS -->
+<div class="page" id="page-marks">
+  <div class="marks-layout">
+    <div class="marks-sidebar">
+      <div class="sb-head">SUBJECTS</div>
+      <button class="sub-btn active" onclick="switchSub('physics')" id="sb-physics">
+        <div class="sb-top"><span class="sb-name" style="color:var(--physics)">⚡ Physics</span><span class="sb-pct" id="sp-physics" style="color:var(--physics)">0%</span></div>
+        <div class="sb-bar"><div class="sb-fill" id="sf-physics" style="background:var(--physics);width:0%"></div></div>
+      </button>
+      <button class="sub-btn" onclick="switchSub('chemistry')" id="sb-chemistry">
+        <div class="sb-top"><span class="sb-name" style="color:var(--chemistry)">🧪 Chemistry</span><span class="sb-pct" id="sp-chemistry" style="color:var(--chemistry)">0%</span></div>
+        <div class="sb-bar"><div class="sb-fill" id="sf-chemistry" style="background:var(--chemistry);width:0%"></div></div>
+      </button>
+      <button class="sub-btn" onclick="switchSub('maths')" id="sb-maths">
+        <div class="sb-top"><span class="sb-name" style="color:var(--maths)">📐 Maths</span><span class="sb-pct" id="sp-maths" style="color:var(--maths)">0%</span></div>
+        <div class="sb-bar"><div class="sb-fill" id="sf-maths" style="background:var(--maths);width:0%"></div></div>
+      </button>
+      <div class="sb-divider"></div>
+      <div class="sb-head">QUICK STATS</div>
+      <div class="sb-stat">
+        Total: <span id="qs-tot">0/360</span><br>
+        Filled: <span id="qs-fil" style="color:var(--accent2)">0</span><br>
+        Weak: <span id="qs-wk" style="color:var(--red)">0</span><br>
+        Strong: <span id="qs-st" style="color:var(--green)">0</span>
+      </div>
+    </div>
+    <div class="marks-main">
+      <div class="marks-topbar">
+        <div>
+          <div class="marks-title" id="marks-title">Physics</div>
+          <div class="marks-sub">Enter your score for each chapter</div>
+        </div>
+        <button class="run-btn" onclick="runAnalysis()">Analyse & See Results →</button>
+      </div>
+      <table class="ch-tbl">
+        <thead><tr>
+          <th class="ch-th" style="width:220px">Chapter</th>
+          <th class="ch-th">Performance</th>
+          <th class="ch-th" style="width:160px">Score</th>
+          <th class="ch-th" style="width:60px">%</th>
+        </tr></thead>
+        <tbody id="ch-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYSIS -->
+<div class="page" id="page-analysis">
+  <div class="anal-wrap">
+    <div class="pg-head">
+      <div class="pg-title">Performance Analysis</div>
+      <div class="pg-sub" id="anal-meta">Run analysis to see your results</div>
+    </div>
+    <div id="anal-content">
+      <div class="empty-wrap"><div class="empty-ico">📊</div><div class="empty-t">No Analysis Yet</div><div class="empty-s">Enter your marks and click Analyse</div><button class="btn-glow" onclick="go('marks')">Enter Marks →</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDY PLAN -->
+<div class="page" id="page-plan">
+  <div class="plan-wrap">
+    <div class="pg-head">
+      <div class="pg-title">2-Week Study Plan</div>
+      <div class="pg-sub">AI-generated daily schedule based on your weak areas</div>
+    </div>
+    <div id="plan-content">
+      <div class="empty-wrap"><div class="empty-ico">📅</div><div class="empty-t">No Plan Yet</div><div class="empty-s">Run your analysis first to generate a plan</div><button class="btn-glow" onclick="go('marks')">Get Started →</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="page" id="page-leaderboard">
+  <div class="lb-wrap">
+    <div class="pg-head">
+      <div class="pg-title">Leaderboard</div>
+      <div class="pg-sub">See how you rank against other JEE aspirants</div>
+    </div>
+    <div id="lb-content"></div>
+  </div>
+</div>
+
+<script>
+const CHAPS={
+  physics:[{n:'Kinematics',m:10},{n:'Laws of Motion',m:10},{n:'Work & Energy',m:10},{n:'Rotational Motion',m:10},{n:'Gravitation',m:10},{n:'Fluid Mechanics',m:8},{n:'Thermodynamics',m:10},{n:'Waves',m:8},{n:'Electrostatics',m:10},{n:'Current Electricity',m:10},{n:'Magnetism',m:10},{n:'Modern Physics',m:10}],
+  chemistry:[{n:'Mole Concept',m:10},{n:'Chemical Bonding',m:10},{n:'Equilibrium',m:10},{n:'Thermodynamics',m:8},{n:'Electrochemistry',m:8},{n:'Organic Basics',m:10},{n:'Hydrocarbons',m:10},{n:'Aldehydes & Ketones',m:8},{n:'Coordination Compounds',m:10},{n:'p-Block Elements',m:10},{n:'d & f Block',m:8},{n:'Solutions',m:8}],
+  maths:[{n:'Algebra Basics',m:10},{n:'Quadratic Equations',m:10},{n:'Sequences & Series',m:8},{n:'Permutation & Combination',m:8},{n:'Probability',m:10},{n:'Matrices & Determinants',m:10},{n:'Trigonometry',m:10},{n:'Coordinate Geometry',m:10},{n:'Limits & Continuity',m:10},{n:'Differentiation',m:10},{n:'Integration',m:10},{n:'3D & Vectors',m:10}]
+};
+const LB=[{name:'Aryan S.',city:'Kota',overall:82,ph:85,ch:78,ma:83},{name:'Priya M.',city:'Delhi',overall:79,ph:74,ch:82,ma:81},{name:'Rohan K.',city:'Jaipur',overall:75,ph:80,ch:70,ma:76},{name:'Sneha P.',city:'Mumbai',overall:71,ph:68,ch:75,ma:70},{name:'Vikram T.',city:'Hyderabad',overall:68,ph:72,ch:65,ma:68},{name:'Ananya R.',city:'Pune',overall:64,ph:60,ch:68,ma:64},{name:'Karan B.',city:'Chandigarh',overall:59,ph:62,ch:55,ma:61},{name:'Divya N.',city:'Chennai',overall:54,ph:50,ch:58,ma:55}];
+
+let sc={physics:{},chemistry:{},maths:{}};
+let curSub='physics';
+let chts={};
+let aData=null;
+
+function buildTable(){
+  const tb=document.getElementById('ch-tbody');
+  tb.innerHTML='';
+  CHAPS[curSub].forEach((ch,i)=>{
+    const val=sc[curSub][i]||0;
+    const pct=val>0?Math.round((val/ch.m)*100):0;
+    const col=pct>=60?'#00e676':pct>=40?'#ffaa00':'#ff4444';
+    const tr=document.createElement('tr');
+    tr.className='ch-tr';
+    tr.innerHTML=`<td class="ch-td"><div class="ch-name">${ch.n}</div></td>
+    <td class="ch-td"><div class="ch-bar-wrap"><div class="ch-bar-fill" id="bar_${curSub}_${i}" style="width:${pct}%;background:${col}"></div></div><div class="ch-bar-lbl" id="blbl_${curSub}_${i}">${val>0?pct+'% of '+ch.m:'Not entered'}</div></td>
+    <td class="ch-td"><div class="ch-input-wrap"><input class="ch-inp" type="number" min="0" max="${ch.m}" value="${val||''}" placeholder="0" oninput="onScore('${curSub}',${i},${ch.m},this.value)" id="inp_${curSub}_${i}"><span class="ch-max">/ ${ch.m}</span></div></td>
+    <td class="ch-td"><span class="ch-pct" id="pct_${curSub}_${i}" style="color:${val>0?col:'#44447a'}">${val>0?pct+'%':'—'}</span></td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('marks-title').textContent=curSub.charAt(0).toUpperCase()+curSub.slice(1);
+}
+
+function onScore(sub,i,max,raw){
+  const val=Math.min(max,Math.max(0,parseFloat(raw)||0));
+  sc[sub][i]=val;
+  const pct=Math.round((val/max)*100);
+  const col=pct>=60?'#00e676':pct>=40?'#ffaa00':'#ff4444';
+  const b=document.getElementById('bar_'+sub+'_'+i);
+  const l=document.getElementById('blbl_'+sub+'_'+i);
+  const p=document.getElementById('pct_'+sub+'_'+i);
+  if(b){b.style.width=pct+'%';b.style.background=col;}
+  if(l)l.textContent=val>0?pct+'% of '+max:'Not entered';
+  if(p){p.textContent=val>0?pct+'%':'—';p.style.color=val>0?col:'#44447a';}
+  updateSidebar();
+}
+
+function getStats(sub){
+  let got=0,tot=0,chs=[];
+  CHAPS[sub].forEach((ch,i)=>{const v=sc[sub][i]||0;got+=v;tot+=ch.m;chs.push({n:ch.n,got:v,max:ch.m,pct:ch.m>0?Math.round((v/ch.m)*100):0,sub});});
+  return{got,tot,pct:tot>0?Math.round((got/tot)*100):0,chs};
+}
+
+function updateSidebar(){
+  ['physics','chemistry','maths'].forEach(s=>{
+    const st=getStats(s);
+    const f=document.getElementById('sf-'+s);
+    const p=document.getElementById('sp-'+s);
+    if(f)f.style.width=st.pct+'%';
+    if(p)p.textContent=st.pct+'%';
+  });
+  const all=['physics','chemistry','maths'].flatMap(s=>getStats(s).chs);
+  const fil=all.filter(c=>c.got>0).length;
+  const wk=all.filter(c=>c.pct<50&&c.got>0).length;
+  const st=all.filter(c=>c.pct>=70).length;
+  const tg=['physics','chemistry','maths'].reduce((a,s)=>a+getStats(s).got,0);
+  document.getElementById('qs-tot').textContent=tg+'/360';
+  document.getElementById('qs-fil').textContent=fil;
+  document.getElementById('qs-wk').textContent=wk;
+  document.getElementById('qs-st').textContent=st;
+}
+
+function switchSub(sub){
+  curSub=sub;
+  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sb-'+sub).classList.add('active');
+  buildTable();
+}
+
+function runAnalysis(){
+  const ph=getStats('physics'),ch=getStats('chemistry'),ma=getStats('maths');
+  const all=[...ph.chs,...ch.chs,...ma.chs];
+  const tg=ph.got+ch.got+ma.got,tm=ph.tot+ch.tot+ma.tot;
+  aData={overall:Math.round((tg/tm)*100),subs:{physics:ph,chemistry:ch,maths:ma},weak:all.filter(c=>c.pct<50).sort((a,b)=>a.pct-b.pct),strong:all.filter(c=>c.pct>=70).sort((a,b)=>b.pct-a.pct),mid:all.filter(c=>c.pct>=50&&c.pct<70),done:all.filter(c=>c.got>0).length};
+  document.getElementById('nav-score').textContent=aData.overall+'%';
+  document.getElementById('hs-ov').textContent=aData.overall+'%';
+  document.getElementById('hs-wk').textContent=aData.weak.length;
+  document.getElementById('hs-st').textContent=aData.strong.length;
+  document.getElementById('hs-dn').textContent=aData.done;
+  renderAnalysis();
+  buildLB();
+  go('analysis');
+}
+
+function renderAnalysis(){
+  if(!aData)return;
+  const{overall,subs,weak,strong,mid,done}=aData;
+  document.getElementById('anal-meta').textContent=done+' chapters filled · Last updated just now';
+  const makeList=(arr,cls)=>arr.length?arr.map(c=>`<div class="chap-row2 ${cls}"><div><div class="cr-name">${c.n}</div><div class="cr-sub">${c.sub.charAt(0).toUpperCase()+c.sub.slice(1)} · ${c.got}/${c.max}</div></div><div class="cr-pct" style="color:${cls==='w'?'var(--red)':cls==='s'?'var(--green)':'var(--amber)'}">${c.pct}%</div></div>`).join(''):'<div style="font-size:12px;color:var(--text2);padding:8px 0">None</div>';
+  document.getElementById('anal-content').innerHTML=`
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--kc:rgba(0,240,255,0.08)"><div class="kpi-val" style="color:var(--accent2)">${overall}%</div><div class="kpi-lbl">OVERALL</div></div>
+      <div class="kpi-card" style="--kc:rgba(56,189,248,0.07)"><div class="kpi-val" style="color:var(--physics)">${subs.physics.pct}%</div><div class="kpi-lbl">PHYSICS</div></div>
+      <div class="kpi-card" style="--kc:rgba(52,211,153,0.07)"><div class="kpi-val" style="color:var(--chemistry)">${subs.chemistry.pct}%</div><div class="kpi-lbl">CHEMISTRY</div></div>
+      <div class="kpi-card" style="--kc:rgba(251,146,60,0.07)"><div class="kpi-val" style="color:var(--maths)">${subs.maths.pct}%</div><div class="kpi-lbl">MATHS</div></div>
+      <div class="kpi-card" style="--kc:rgba(255,68,68,0.07)"><div class="kpi-val" style="color:var(--red)">${weak.length}</div><div class="kpi-lbl">WEAK</div></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="cc-head">SUBJECT SCORES</div><div class="chart-h"><canvas id="barC" role="img" aria-label="Subject scores bar chart"></canvas></div></div>
+      <div class="chart-card"><div class="cc-head">DISTRIBUTION</div><div class="chart-h"><canvas id="doughC" role="img" aria-label="Score distribution doughnut chart"></canvas></div></div>
+    </div>
+    <div class="lists-grid">
+      <div class="list-card"><div class="lc-head">⚠ WEAK <span class="count-pill cp-red">${weak.length}</span></div>${makeList(weak,'w')}</div>
+      <div class="list-card"><div class="lc-head">~ AVERAGE <span class="count-pill cp-amber">${mid.length}</span></div>${makeList(mid.slice(0,5),'m')}</div>
+      <div class="list-card"><div class="lc-head">✓ STRONG <span class="count-pill cp-green">${strong.length}</span></div>${makeList(strong.slice(0,5),'s')}</div>
+    </div>
+    <button class="ai-btn" onclick="genPlan()">✦ Generate My AI-Powered 2-Week Study Plan</button>`;
+  Object.values(chts).forEach(c=>{try{c.destroy();}catch(e){}});chts={};
+  setTimeout(()=>{
+    const bc=document.getElementById('barC');
+    if(bc)chts.bar=new Chart(bc,{type:'bar',data:{labels:['Physics','Chemistry','Maths'],datasets:[{data:[subs.physics.pct,subs.chemistry.pct,subs.maths.pct],backgroundColor:['rgba(56,189,248,0.8)','rgba(52,211,153,0.8)','rgba(251,146,60,0.8)'],borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{color:'#8888bb',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}},x:{ticks:{color:'#8888bb'},grid:{display:false}}}}});
+    const dc=document.getElementById('doughC');
+    if(dc)chts.dough=new Chart(dc,{type:'doughnut',data:{labels:['Weak','Average','Strong'],datasets:[{data:[weak.length,mid.length,strong.length],backgroundColor:['#ff4444','#ffaa00','#00e676'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#8888bb',boxWidth:10,padding:10,font:{size:11}}}}}});
+  },200);
+}
+
+async function genPlan(){
+  go('plan');
+  document.getElementById('plan-content').innerHTML=`<div class="loading-wrap"><div class="spinner"></div><div class="loading-t">AI is building your plan…</div><div class="loading-s">Analysing ${aData?.weak?.length||0} weak chapters</div></div>`;
+  if(!aData)return;
+  const wn=aData.weak.map(c=>`${c.n}(${c.sub},${c.pct}%)`).join(',')||'none';
+  const mn=aData.mid.map(c=>c.n).join(',')||'none';
+  const prompt=`IIT JEE coach. Weak chapters(<50%): ${wn}. Average(50-70%): ${mn}. Make 2-week daily study plan. Reply ONLY valid JSON no markdown no backticks. Format: {"week1":[{"day":"Day 1","title":"max 5 words","detail":"specific JEE task max 20 words","subject":"physics|chemistry|maths|revision|practice"},...7 items],"week2":[...7 items]}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1400,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const text=(data.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    renderPlan(JSON.parse(text));
+  }catch(e){
+    document.getElementById('plan-content').innerHTML=`<div class="empty-wrap"><div class="empty-t">Could not generate plan</div><div class="empty-s">${e.message}</div><button class="btn-glow" onclick="genPlan()">Retry</button></div>`;
+  }
+}
+
+const pillMap={physics:'dp-phy',chemistry:'dp-che',maths:'dp-mat',revision:'dp-rev',practice:'dp-prac'};
+const pillLabel={physics:'Physics',chemistry:'Chemistry',maths:'Maths',revision:'Revision',practice:'Practice'};
+
+function renderPlan(plan){
+  const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const makeW=(items,off)=>items.map((d,i)=>`<div class="day-card"><div class="day-num-box"><span>${days[(off+i)%7]}</span><span style="font-size:9px;opacity:.6">D${off+i+1}</span></div><div class="day-body"><div class="day-title">${d.title||d.day}</div><div class="day-detail">${d.detail}</div><div class="day-pills"><span class="dpill ${pillMap[d.subject]||'dp-rev'}">${pillLabel[d.subject]||'Study'}</span></div></div></div>`).join('');
+  const wtags=(aData?.weak||[]).slice(0,5).map(c=>`<span class="ptag ptag-red">${c.n}</span>`).join('');
+  const stags=[...new Set((aData?.weak||[]).map(c=>c.sub))].map(s=>`<span class="ptag ptag-blue">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`).join('');
+  document.getElementById('plan-content').innerHTML=`<div class="plan-tags">${wtags}${stags}</div><div class="week-header"><div class="wk-num">WEEK 1</div><div class="wk-line"></div><div class="wk-label">Build foundations</div></div>${makeW(plan.week1,0)}<div class="week-header"><div class="wk-num">WEEK 2</div><div class="wk-line"></div><div class="wk-label">Practice & revise</div></div>${makeW(plan.week2,7)}`;
+}
+
+function buildLB(){
+  const my=aData?aData.overall:null;
+  let lb=[...LB];
+  if(my!==null){lb.push({name:'You',city:'Kota',overall:my,ph:aData.subs.physics.pct,ch:aData.subs.chemistry.pct,ma:aData.subs.maths.pct,isYou:true});lb.sort((a,b)=>b.overall-a.overall);}
+  const rows=lb.map((s,i)=>{
+    const r=i+1;const rc=r===1?'r1':r===2?'r2':r===3?'r3':'rn';
+    return `<tr class="lb-tr${s.isYou?' you-row':''}"><td class="lb-td"><span class="rank-chip ${rc}">${r}</span></td><td class="lb-td" style="font-weight:600;color:${s.isYou?'var(--accent2)':'var(--text)'}">${s.name}${s.isYou?' 👈':''}</td><td class="lb-td" style="color:var(--text2)">${s.city}</td><td class="lb-td" style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent2)">${s.overall}%</td><td class="lb-td" style="font-family:'IBM Plex Mono',monospace;color:var(--physics)">${s.ph}%</td><td class="lb-td" style="font-family:'IBM Plex Mono',monospace;color:var(--chemistry)">${s.ch}%</td><td class="lb-td" style="font-family:'IBM Plex Mono',monospace;color:var(--maths)">${s.ma}%</td></tr>`;
+  }).join('');
+  document.getElementById('lb-content').innerHTML=`<table class="lb-tbl"><thead><tr><th class="lb-th">RANK</th><th class="lb-th">STUDENT</th><th class="lb-th">CITY</th><th class="lb-th">OVERALL</th><th class="lb-th" style="color:var(--physics)">PHYSICS</th><th class="lb-th" style="color:var(--chemistry)">CHEMISTRY</th><th class="lb-th" style="color:var(--maths)">MATHS</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const idx={home:0,marks:1,analysis:2,plan:3,leaderboard:4}[id];
+  document.querySelectorAll('.nt')[idx].classList.add('active');
+  if(id==='leaderboard'&&!aData)buildLB();
+}
+
+buildTable();buildLB();
+</script>
+</body>
+</html>
